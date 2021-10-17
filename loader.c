@@ -179,8 +179,13 @@ xdp_link_attach(int ifindex, uint32_t xdp_flags, int prog_fd)
         old_flags = xdp_flags;
 
         xdp_flags &= ~XDP_FLAGS_MODES;
-        xdp_flags |= (old_flags & XDP_FLAGS_SKB_MODE) ? XDP_FLAGS_DRV_MODE :
-            XDP_FLAGS_SKB_MODE;
+
+        if (old_flags & XDP_FLAGS_SKB_MODE) {
+            xdp_flags |= XDP_FLAGS_DRV_MODE;
+
+        } else {
+            xdp_flags |= XDP_FLAGS_SKB_MODE;
+        }
 
         err = bpf_set_link_xdp_fd(ifindex, -1, xdp_flags);
         if (!err) {
