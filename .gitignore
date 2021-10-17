@@ -1,0 +1,8 @@
+*.o
+
+# bpftool generated
+ipblock.skel.h
+
+# bin
+ipblock-loader
+ipblock-rule
