@@ -63,8 +63,9 @@ $ ./ipblock-rule -d 192.168.31.0/24
 
 ### Reference
 
-- [BPF and XDP Reference Guide](https://docs.cilium.io/en/v1.10/bpf/)
-- [github libbpf](https://github.com/libbpf/libbpf)
-- [BPF Portability and CO-RE](https://facebookmicrosites.github.io/bpf/blog/2020/02/19/bpf-portability-and-co-re.html)
+[BPF and XDP Reference Guide](https://docs.cilium.io/en/v1.10/bpf/)
 
+[github libbpf](https://github.com/libbpf/libbpf)
+
+[BPF Portability and CO-RE](https://facebookmicrosites.github.io/bpf/blog/2020/02/19/bpf-portability-and-co-re.html)
 
