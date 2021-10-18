@@ -294,7 +294,7 @@ do_add_cmd(options_t *opt)
     memcpy(lpm->data, &opt->cidr.sockaddr, opt->cidr.socklen);
 
     if (bpf_map_update_elem(fd, lpm, &opt->action, BPF_ANY) != 0) {
-        log_err("Failed to delete bpf map item err(%d):%s\n",
+        log_err("Failed to update bpf map item err(%d):%s\n",
                 errno, strerror(errno));
         goto cleanup;
     }
