@@ -119,6 +119,7 @@ is_valid_prefixlen(int af, int prefixlen)
 {
     if (af == AF_INET) {
         return prefixlen > 0 && prefixlen <= 32;
+
     } else {
         return prefixlen > 0 && prefixlen <= 128;
     }

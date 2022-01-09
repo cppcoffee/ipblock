@@ -115,8 +115,8 @@ struct ethhdr *parse_eth(struct cursor *c, uint16_t *eth_proto)
 
     *eth_proto = eth->h_proto;
 
-    if (*eth_proto == bpf_htons(ETH_P_8021Q) ||
-        *eth_proto == bpf_htons(ETH_P_8021AD))
+    if (*eth_proto == bpf_htons(ETH_P_8021Q)
+        || *eth_proto == bpf_htons(ETH_P_8021AD))
     {
         vlan = parse_vlanhdr(c);
         if (vlan == NULL) {
@@ -125,8 +125,8 @@ struct ethhdr *parse_eth(struct cursor *c, uint16_t *eth_proto)
 
         *eth_proto = vlan->encap_proto;
 
-        if (*eth_proto == bpf_htons(ETH_P_8021Q) ||
-            *eth_proto == bpf_htons(ETH_P_8021AD))
+        if (*eth_proto == bpf_htons(ETH_P_8021Q)
+            || *eth_proto == bpf_htons(ETH_P_8021AD))
         {
             vlan = parse_vlanhdr(c);
             if (vlan == NULL) {
