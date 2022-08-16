@@ -4,6 +4,9 @@ IP-Block is an XDP program, that is an IP firewall. use rules to allow/deny acce
 
 Block ip behavior use XDP package drop.
 
+### Dependency
+
+The project depends on the `libbpf` library, you can install the `libbpf-dev` package on ubuntu, or you can install it from source https://github.com/libbpf/libbpf
 
 ### Build
 
