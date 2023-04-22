@@ -4,18 +4,17 @@ IP-Block is an XDP program, that is an IP firewall. use rules to allow/deny acce
 
 Block ip behavior use XDP package drop.
 
-### Dependency
-
-The project depends on the `libbpf` library, you can install the `libbpf-dev` package on ubuntu, or you can install it from source https://github.com/libbpf/libbpf
-
 ### Build
 
 ```shell
+$ git submodule update
 $ make
 ```
 
-- *ipblock-loader* is XDP loader, which is used to load and unload XDP program.
-- *ipblock-rule* is used to control the add and remove of rules.
+After compilation, two executable programs are generated:
+
+- *src/ipblock-loader* is XDP loader, which is used to load and unload XDP program.
+- *src/ipblock-rule* is used to control the add and remove of rules.
 
 
 ### Usage
