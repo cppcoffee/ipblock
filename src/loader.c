@@ -174,7 +174,7 @@ xdp_link_attach(int ifindex, uint32_t xdp_flags, int prog_fd)
     int             err;
     uint32_t        old_flags;
 
-    err = bpf_set_link_xdp_fd(ifindex, prog_fd, xdp_flags);
+    err = bpf_xdp_attach(ifindex, prog_fd, xdp_flags, NULL);
     if (err == -EEXIST && !(xdp_flags & XDP_FLAGS_UPDATE_IF_NOEXIST)) {
         old_flags = xdp_flags;
 
@@ -187,9 +187,9 @@ xdp_link_attach(int ifindex, uint32_t xdp_flags, int prog_fd)
             xdp_flags |= XDP_FLAGS_SKB_MODE;
         }
 
-        err = bpf_set_link_xdp_fd(ifindex, -1, xdp_flags);
+        err = bpf_xdp_attach(ifindex, -1, xdp_flags, NULL);
         if (!err) {
-            err = bpf_set_link_xdp_fd(ifindex, prog_fd, old_flags);
+            err = bpf_xdp_attach(ifindex, prog_fd, old_flags, NULL);
         }
     }
 
@@ -224,7 +224,7 @@ xdp_link_detach(int ifindex, uint32_t xdp_flags, uint32_t expected_prog_id)
     int                 err;
     uint32_t            curr_prog_id;
 
-    err = bpf_get_link_xdp_id(ifindex, &curr_prog_id, xdp_flags);
+    err = bpf_xdp_query_id(ifindex, xdp_flags, &curr_prog_id);
     if (err) {
         log_err("ERR: get link xdp id failed (err=%d): %s\n",
                 -err, strerror(-err));
@@ -241,7 +241,7 @@ xdp_link_detach(int ifindex, uint32_t xdp_flags, uint32_t expected_prog_id)
         return 1;
     }
 
-    err = bpf_set_link_xdp_fd(ifindex, -1, xdp_flags);
+    err = bpf_xdp_attach(ifindex, -1, xdp_flags, NULL);
     if (err < 0) {
         log_err("ERR: link set xdp failed (err=%d): %s\n",
                 -err, strerror(-err));
