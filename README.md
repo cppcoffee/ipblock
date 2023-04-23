@@ -7,6 +7,7 @@ Block ip behavior use XDP package drop.
 ### Build
 
 ```shell
+$ git submodule init
 $ git submodule update
 $ make
 ```
