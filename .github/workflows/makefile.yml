@@ -18,7 +18,7 @@ jobs:
       run: sudo apt-get install -y gcc-multilib pkg-config m4 libelf-dev libpcap-dev
 
     - name: Pull submodule
-      run: git submodule update
+      run: git submodule init; git submodule update
 
     - name: Run make
       run: make
