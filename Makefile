@@ -1,4 +1,4 @@
-.PHONY: clean all
+.PHONY: clean all libbpf
 
 all: libbpf
 	$(MAKE) -C ./src

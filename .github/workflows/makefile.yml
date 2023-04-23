@@ -19,3 +19,4 @@ jobs:
 
     - name: Run make
       run: make
+
