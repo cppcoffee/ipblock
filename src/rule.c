@@ -363,6 +363,22 @@ fail:
 }
 
 
+static const char *
+action_str(enum xdp_action action)
+{
+    switch (action) {
+    case XDP_PASS:
+        return "allow";
+
+    case XDP_DROP:
+        return "deny";
+
+    default:
+        return "unknown";
+    }
+}
+
+
 static int
 dump_rules(int af)
 {
@@ -375,7 +391,7 @@ dump_rules(int af)
     key = NULL;
     rc = map_fd = -1;
 
-    key = calloc(1, sizeof(struct bpf_lpm_trie_key) + sizeof(struct in6_addr));
+    key = calloc(1, sizeof(*key) + sizeof(struct in6_addr));
     if (key == NULL) {
         log_err("Failed to calloc, err(%d):%s\n", errno, strerror(errno));
         goto fail;
@@ -395,7 +411,7 @@ dump_rules(int af)
 				continue;
             }
 
-			log_err("map lookup error: %s\n", strerror(errno));
+            log_err("map lookup error: %s\n", strerror(errno));
             goto fail;
 		}
 
@@ -405,7 +421,7 @@ dump_rules(int af)
             goto fail;
         }
 
-        printf(" %s/%d -> %d\n", p, key->prefixlen, action);
+        printf(" %s/%d -> %s\n", p, key->prefixlen, action_str(action));
     }
 
     rc = 0;
