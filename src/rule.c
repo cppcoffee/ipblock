@@ -25,6 +25,7 @@
 typedef enum {
     COMMAND_ADD = 0,
     COMMAND_DEL,
+    COMMAND_LIST,
     COMMAND_UNUSED,
 } command_e;
 
@@ -58,12 +59,14 @@ typedef int (*command_call_pt)(options_t *);
 
 static int do_add_cmd(options_t *opt);
 static int do_del_cmd(options_t *opt);
+static int do_list_cmd(options_t *opt);
 
 
 // declare command function
 static command_call_pt  commands[] = {
     do_add_cmd,
     do_del_cmd,
+    do_list_cmd,
 };
 
 
@@ -87,17 +90,18 @@ static void
 show_usage(const char *name)
 {
     const char *program_doc_fmt =
-"Usage: %s cmd [rule]\n"
-"\n"
-"Commands:\n"
-"  -a cidr              Add IP rule use, with -p 'action'\n"
-"  -d cidr              Delete IP rule\n"
-"  -p action            Apply action. support allow|deny\n"
-"  -h                   Print this help information\n"
-"\n"
-"Examples:\n"
-"  %s -a 192.168.1.0/24 -p allow\n"
-"  %s -d ::ffff:c612:13/128\n";
+        "Usage: %s cmd [rule]\n"
+        "\n"
+        "Commands:\n"
+        "  -a cidr              Add IP rule use, with -p 'action'\n"
+        "  -d cidr              Delete IP rule\n"
+        "  -p action            Apply action. support allow|deny\n"
+        "  -l                   List all IP rules\n"
+        "  -h                   Print this help information\n"
+        "\n"
+        "Examples:\n"
+        "  %s -a 192.168.1.0/24 -p allow\n"
+        "  %s -d ::ffff:c612:13/128\n";
 
     printf(program_doc_fmt, name, name, name);
 }
@@ -198,7 +202,7 @@ parse_cmdline(int argc, char *argv[], options_t *opt)
     int              c;
     char            *err;
 
-    while ((c = getopt(argc, argv, "a:d:p:h")) != -1) {
+    while ((c = getopt(argc, argv, "a:d:p:lh")) != -1) {
         switch (c) {
         case 'a':
             if (parse_cidr(optarg, &opt->cidr, &err) != 0) {
@@ -223,6 +227,10 @@ parse_cmdline(int argc, char *argv[], options_t *opt)
                 log_err("ERR: failed parse action '%s'\n", optarg);
                 exit(EXIT_FAILURE);
             }
+            break;
+
+        case 'l':
+            opt->cmd = COMMAND_LIST;
             break;
 
         case 'h':
@@ -298,12 +306,12 @@ do_add_cmd(options_t *opt)
     if (bpf_map_update_elem(fd, lpm, &opt->action, BPF_ANY) != 0) {
         log_err("Failed to update bpf map item err(%d):%s\n",
                 errno, strerror(errno));
-        goto cleanup;
+        goto fail;
     }
 
     rc = 0;
 
-cleanup:
+fail:
 
     free(lpm);
     close(fd);
@@ -341,17 +349,114 @@ do_del_cmd(options_t *opt)
     if (bpf_map_delete_elem(fd, lpm) != 0) {
         log_err("Failed to delete bpf map item err(%d):%s\n",
                 errno, strerror(errno));
-        goto cleanup;
+        goto fail;
     }
 
     rc = 0;
 
-cleanup:
+fail:
 
     free(lpm);
     close(fd);
 
     return rc;
+}
+
+
+static const char *
+action_str(enum xdp_action action)
+{
+    switch (action) {
+    case XDP_PASS:
+        return "allow";
+
+    case XDP_DROP:
+        return "deny";
+
+    default:
+        return "unknown";
+    }
+}
+
+
+static int
+dump_rules(int af)
+{
+    struct bpf_lpm_trie_key     *key;
+    enum xdp_action              action;
+    char                         buf[INET6_ADDRSTRLEN];
+    const char                  *p;
+    int                          rc, map_fd;
+
+    key = NULL;
+    rc = map_fd = -1;
+
+    key = calloc(1, sizeof(*key) + sizeof(struct in6_addr));
+    if (key == NULL) {
+        log_err("Failed to calloc, err(%d):%s\n", errno, strerror(errno));
+        goto fail;
+    }
+
+    map_fd = open_bpf_map(af);
+    if (map_fd == -1) {
+        log_err("Failed to open bpf map file, err(%d):%s\n",
+                errno, strerror(errno));
+
+        goto fail;
+    }
+
+    while (bpf_map_get_next_key(map_fd, key, key) == 0) {
+        if (bpf_map_lookup_elem(map_fd, key, &action)) {
+            if (errno == ENOENT) {
+                continue;
+            }
+
+            log_err("map lookup error: %s\n", strerror(errno));
+            goto fail;
+        }
+
+        p = inet_ntop(af, key->data, buf, INET6_ADDRSTRLEN);
+        if (p == NULL) {
+            log_err("inet_ntop error: %s\n", strerror(errno));
+            goto fail;
+        }
+
+        printf(" %s/%d -> %s\n", p, key->prefixlen, action_str(action));
+    }
+
+    rc = 0;
+
+fail:
+    if (map_fd != -1) {
+        close(map_fd);
+    }
+
+    if (key != NULL) {
+        free(key);
+    }
+
+    return rc;
+}
+
+
+static int
+do_list_cmd(options_t *opt)
+{
+    printf("IPv4 Rule List:\n");
+    if (dump_rules(AF_INET) != 0) {
+        return -1;
+    }
+
+    printf("\n");
+
+    printf("IPv6 Rule List:\n");
+    if (dump_rules(AF_INET6) != 0) {
+        return -1;
+    }
+
+    printf("\n");
+
+    return 0;
 }
 
 

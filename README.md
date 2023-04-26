@@ -64,6 +64,13 @@ $ ./ipblock-rule -d 192.168.31.0/24
 ```
 
 
+#### List rules
+
+```shell
+$ ./ipblock-rule -l
+```
+
+
 ### Reference
 
 [BPF and XDP Reference Guide](https://docs.cilium.io/en/v1.10/bpf/)
