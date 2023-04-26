@@ -406,14 +406,14 @@ dump_rules(int af)
     }
 
     while (bpf_map_get_next_key(map_fd, key, key) == 0) {
-		if (bpf_map_lookup_elem(map_fd, key, &action)) {
-			if (errno == ENOENT) {
-				continue;
+        if (bpf_map_lookup_elem(map_fd, key, &action)) {
+            if (errno == ENOENT) {
+                continue;
             }
 
             log_err("map lookup error: %s\n", strerror(errno));
             goto fail;
-		}
+        }
 
         p = inet_ntop(af, key->data, buf, INET6_ADDRSTRLEN);
         if (p == NULL) {
