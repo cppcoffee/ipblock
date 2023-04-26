@@ -80,18 +80,18 @@ static void
 show_usage(const char *prog_name)
 {
     const char program_doc_fmt[] =
-"Usage: %s (options)\n"
-"\n"
-"Options:\n"
-"  -d dev               Operate on device <ifname>\n"
-"  -u                   Unload XDP program instead of loading\n"
-"  -A                   Auto mode. default mode\n"
-"  -S                   Skb mode\n"
-"  -N                   Native mode\n"
-"  -O                   Offload mode\n"
-"  -F                   Force install, replacing existing program on interface\n"
-"  -D                   Debug output\n"
-"  -h                   Print this help information\n";
+        "Usage: %s (options)\n"
+        "\n"
+        "Options:\n"
+        "  -d dev               Operate on device <ifname>\n"
+        "  -u                   Unload XDP program instead of loading\n"
+        "  -A                   Auto mode. default mode\n"
+        "  -S                   Skb mode\n"
+        "  -N                   Native mode\n"
+        "  -O                   Offload mode\n"
+        "  -F                   Force install, replacing existing program on interface\n"
+        "  -D                   Debug output\n"
+        "  -h                   Print this help information\n";
 
     printf(program_doc_fmt, prog_name);
 }
