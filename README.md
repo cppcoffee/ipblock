@@ -1,6 +1,8 @@
+
+
 ## Description
 
-IP-Block is an XDP program, that is an IP firewall. use rules to allow/deny access to a range of IP addresses.
+IP-Block is an XDP program, that is an IP firewall. use rules to allow/deny access to a range of source IP addresses.
 
 Block ip behavior use XDP package drop.
 
@@ -78,4 +80,3 @@ $ ./ipblock-rule -l
 [github libbpf](https://github.com/libbpf/libbpf)
 
 [BPF Portability and CO-RE](https://facebookmicrosites.github.io/bpf/blog/2020/02/19/bpf-portability-and-co-re.html)
-
